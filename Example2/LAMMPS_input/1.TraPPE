@@ -1,0 +1,42 @@
+echo none
+# Sample LAMMPS input script for thermodynamic property calculations of Methane (TraPPE force field) 
+units       real
+variable    T equal 465.15 #Define T (K)
+variable    P equal 63.5 #Define P (MPa)
+variable    Patm equal ${P}/0.101325
+variable    V equal vol
+variable    dt equal 1.0
+variable    thermo_freq equal 1000
+variable    run_eq equal 5000000
+variable    run_prod equal 5000000
+variable    seed equal 2344789
+
+# setup
+
+units			real				
+atom_style		full				
+pair_style		lj/cut 14.92		
+pair_modify		mix arithmetic tail yes	
+
+read_data		TraPPE_512CH4.lammps_data
+velocity 		all create ${T} ${seed} mom yes rot yes dist gaussian
+minimize 		1.0e-4 1.0e-6 1000.0 100000.0
+timestep		${dt}									
+fix			fnpt all npt temp ${T} ${T} 100.0 iso ${Patm} ${Patm} 1000.0
+
+#Equilibration
+			
+run			${run_eq}
+
+#Production
+
+log			107_log.lammps
+thermo			${thermo_freq}
+thermo_style		custom step press vol temp pe ke etotal enthalpy evdwl ecoul etail elong ebond eangle edihed eimp emol 
+run			${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T}"
+print			"Pressure (MPa)"
+print                   "${P}"

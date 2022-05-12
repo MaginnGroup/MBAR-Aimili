@@ -1,0 +1,98 @@
+echo none
+# Sample LAMMPS input script for thermodynamic property calculations of Methane (TraPPE force field) 
+units       real
+variable    T1 equal 300.15
+variable    T2 equal 350.15
+variable    T3 equal 410.15
+variable    T4 equal 490.15
+variable    T5 equal 600.15
+variable    V equal vol
+variable    dt equal 1.0
+variable    thermo_freq equal 50
+variable    run_eq equal 20000
+variable    run_prod equal 50000
+variable    seed equal 2344789
+
+# setup
+dimension    3
+boundary     p p p
+lattice      fcc 6.2 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region       box block 0 4 0 4 0 4
+create_box   1 box
+create_atoms 1 box
+mass	     1 16.04246
+pair_style   lj/cut 11.19
+pair_coeff   * * 0.294106213559 3.730
+pair_modify  tail yes	
+timestep     ${dt}
+thermo       ${thermo_freq}
+thermo_style custom step press vol temp pe ke etotal emol
+
+# 1st run
+velocity     all create ${T1} ${seed} mom yes rot yes dist gaussian
+fix          NVT all nvt temp ${T1} ${T1} 100
+run          ${run_eq}
+log          1_log.lammps
+run          ${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T1}"
+print			"Volume (A3)"
+print                   "${V}"
+log          log.lammps
+
+# 2nd run
+velocity     all create ${T2} ${seed} mom yes rot yes dist gaussian
+fix          NVT all nvt temp ${T2} ${T2} 100
+run          ${run_eq} 
+log          2_log.lammps
+run          ${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T2}"
+print			"Volume (A3)"
+print                   "${V}"
+log          log.lammps
+
+# 3rd run
+velocity     all create ${T3} ${seed} mom yes rot yes dist gaussian
+fix          NVT all nvt temp ${T3} ${T3} 100
+run          ${run_eq} 
+log          3_log.lammps
+run          ${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T3}"
+print			"Volume (A3)"
+print                   "${V}"
+log          log.lammps
+
+# 4th run
+velocity     all create ${T4} ${seed} mom yes rot yes dist gaussian
+fix          NVT all nvt temp ${T4} ${T4} 100
+run          ${run_eq} 
+log          4_log.lammps
+run          ${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T4}"
+print			"Volume (A3)"
+print                   "${V}"
+log          log.lammps
+
+# 5th run
+velocity     all create ${T5} ${seed} mom yes rot yes dist gaussian
+fix          NVT all nvt temp ${T5} ${T5} 100
+run          ${run_eq} 
+log          5_log.lammps
+run          ${run_prod}
+
+print			"Nominal values"
+print			"Temperature (K)"
+print			"${T5}"
+print			"Volume (A3)"
+print                   "${V}"
